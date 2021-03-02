@@ -1,32 +1,34 @@
 from kafka import KafkaConsumer
-import sqlalchemy
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import sessionmaker
+from multiprocessing import Process
 import json
+from models import Book
+import sqlalchemy
 
-engine = sqlalchemy.create_engine('mysql://lab:osmentos@mysqldb:3306/sqlalchemy',echo=True)
-session = sessionmaker(bind=engine)
-session.configure(bind=engine)
+bootstrap_servers=['172.17.0.1:9091'] 
+engine = sqlalchemy.create_engine('mysql://lab:osmentos@mysqldb:3306/library',echo=True)
+value_deserializer=lambda m: json.loads(m.decode('utf-8')) 
+Session = sessionmaker(bind=engine)
+session = Session()
 
+# topics=['add_book']
+def add_book():
+    try:
+        consumer = KafkaConsumer('add_book', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
+    except Exception as e:
+        print(str(e))
 
-Base = declarative_base()
+    for message in consumer:
+        print (message.value)
+        ed=Book(book_name=message.value['book_name'],author_name='VASU',description='HAPPY BIRTHDAY')
+        session.add(ed)
+        session.commit()
 
-class User(Base):
-    __tablename__ = 'library'
-    id = Column(Integer, primary_key=True)
-    book_name = Column(String(64))
-    author_name =Column(String(64))
-    description= Column(String(300))
-    # publish=DateField('Start Date', format='%m/%d/%Y')
-    condition=Column(String(100))
+# for topic in topics:
+Process(target=add_book).start()
+#     t.start()
 
+# def issue_book():
+#     try:
+#         consumer = KafkaConsumer('issue_book', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
 
-    
-
-consumer = KafkaConsumer('books', bootstrap_servers=['172.17.0.1:9091'] , value_deserializer=lambda m: json.loads(m.decode('utf-8')))
-for message in consumer:
-    print (message.value)
-    ed=User(book_name=message.value['book_name'],author_name='VASU',description='HAPPY BIRTHDAY')
-    session.add(ed)

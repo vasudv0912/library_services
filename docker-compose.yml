@@ -27,6 +27,8 @@ services:
         volumes:
           - ./mysqllab:/var/lib/mysqllab
           - ./sqllab:/docker-entrypoint-initdb.d
+        networks:
+          - server_kafka_net
 
 networks:
    server_kafka_net:
