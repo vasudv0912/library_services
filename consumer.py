@@ -29,7 +29,7 @@ def add_book():
     for message in consumer:
         print(message.value)
         ed = Book(book_name=message.value['book_name'], author_name=message.value['author_name'],
-                  description=message.value['description'], condition=message.value['condition'], owner_id=message.value['owner_id'],is_available=True)
+                  description=message.value['description'], condition=message.value['condition'], owner_id=message.value['owner_id'], is_available=True , current_owner_id=message.value['owner_id'])
         session.add(ed)
         session.commit()
 
@@ -49,9 +49,10 @@ def issue_book():
         print(message.value)
         book = session.query(Book).filter_by(
             id=message.value['book_id']).first()
-        if is_available:
-            ed = Record(_from = book.current_owner_id,_to = message.value['_to'],status ="pending")
-            book.is_available=False
+        if book.is_available:
+            ed = Record(_from=book.current_owner_id,
+                        _to=message.value['_to'], status="pending")
+            book.is_available = False
             book.records.append(ed)
             session.add(book)
             session.commit()
@@ -81,11 +82,8 @@ def edit_book():
 Process(target=edit_book).start()
 
 
-
-
-
 def release_book():
-     try:
+    try:
         consumer = KafkaConsumer(
             'release_book', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
     except Exception as e:
@@ -99,4 +97,64 @@ def release_book():
             book.is_available=True
             session.add(book)
             session.commit()
+
+Process(target=release_book).start()
+
+
+
+
+def delete_book():
+    try:
+        consumer = KafkaConsumer(
+            'delete_book', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
+    except Exception as e:
+        print(str(e))
+
+    for message in consumer:
+        print(message.value)
+        book = session.query(Book).filter_by(
+            id=message.value['book_id']).first()
+        if book.current_owner_id==book.owner_id:
+            session.delete(book)
+            session.commit()
+
+Process(target=delete_book).start()
+
+
+
+def wishlist():
+    try:
+        consumer = KafkaConsumer(
+            'wishlist', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
+    except Exception as e:
+        print(str(e))
+
+    for message in consumer:
+        print(message.value)
+        ed = Wishlist(user_id=message.value['user_id'],book_id=message.value['book_id'])
+        session.add(ed)
+        session.commit()
+
+
+Process(target=wishlist).start()
+
+
+
+def changestatus():
+    try:
+        consumer = KafkaConsumer(
+            'changestatus', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
+    except Exception as e:
+        print(str(e))
+
+    for message in consumer:
+        print(message.value)
+        record = session.query(Record).filter_by(
+            id=message.value['record_id']).first()
+        record.status="completed"
+        record.book.current_owner_id=message.value['current_owner_id']
+        session.commit()
+Process(target=changestatus).start()
+    
+
 

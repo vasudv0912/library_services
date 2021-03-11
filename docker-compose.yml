@@ -9,9 +9,10 @@ services:
         build: . 
         ports:
             - "5004:5004"
+            - "50051:50051"
         volumes:
             - .:/code
-        command: pm2 start --no-daemon ./app/consumer.py
+        command: bash -c "pm2 start ./consumer.py && homi run" 
         networks:
           - server_kafka_net
     mysqldb:
