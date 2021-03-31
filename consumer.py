@@ -7,7 +7,7 @@ import sqlalchemy
 
 bootstrap_servers = ['172.17.0.1:9091']
 engine = sqlalchemy.create_engine(
-    'mysql://lab:osmentos@mysqldb:3306/library', echo=True)
+    'mysql://lab:osmentos@mysqldb:3306/library2', echo=True)
 
 
 def value_deserializer(m): return json.loads(m.decode('utf-8'))
@@ -125,7 +125,7 @@ Process(target=delete_book).start()
 def wishlist():
     try:
         consumer = KafkaConsumer(
-            'wishlist', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
+            'wishlists', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
     except Exception as e:
         print(str(e))
 
@@ -140,10 +140,10 @@ Process(target=wishlist).start()
 
 
 
-def changestatus():
+def change_status():
     try:
         consumer = KafkaConsumer(
-            'changestatus', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
+            'change_status', bootstrap_servers=bootstrap_servers, value_deserializer=value_deserializer)
     except Exception as e:
         print(str(e))
 

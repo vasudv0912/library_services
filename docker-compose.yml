@@ -9,10 +9,10 @@ services:
         build: . 
         ports:
             - "5004:5004"
-            - "50051:50051"
+            - "50059:50059"
         volumes:
             - .:/code
-        command: bash -c "pm2 start ./consumer.py && homi run" 
+        command: bash -c "pm2 start ./consumer.py && pm2 start app.py --no-daemon" 
         networks:
           - server_kafka_net
     mysqldb:
@@ -21,7 +21,7 @@ services:
         ports:
           - '3307:3306'
         environment:
-           MYSQL_DATABASE: 'library'
+           MYSQL_DATABASE: 'library2'
            MYSQL_USER: 'lab'
            MYSQL_PASSWORD: 'osmentos'
            MYSQL_ROOT_PASSWORD: 'osmentos'

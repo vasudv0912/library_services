@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+import "protos/availablebookfields.proto";
+
+
+message AvailableResponseMesg {
+    repeated AvailablebookFields availablebooks = 1;
+}

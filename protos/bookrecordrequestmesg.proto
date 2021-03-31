@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+
+
+message BookRecordRequestMesg {
+    int32 book_id = 1;
+}

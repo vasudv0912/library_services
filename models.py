@@ -5,7 +5,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
 
-engine = create_engine('mysql://lab:osmentos@mysqldb:3306/library', echo=True)
+engine = create_engine('mysql://lab:osmentos@mysqldb:3306/library2', echo=True)
 
 Base = declarative_base()
 
@@ -36,7 +36,6 @@ class Record(Base):
     book = relationship("Book", back_populates="records")
     status =Column(String(20))
 
-
 Record.__table__.create(bind=engine, checkfirst=True)
 
 
@@ -47,3 +46,4 @@ class Wishlist(Base):
     book_id = Column(Integer, ForeignKey('books.id'))
     book = relationship("Book", back_populates="wishlist")
     user_id = Column(Integer)
+Wishlist.__table__.create(bind=engine, checkfirst=True)

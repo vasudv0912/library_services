@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+
+
+message BookDetailsFields {
+    string book_name = 1;
+    string author_name = 2;
+    string description = 3;
+    string condition = 4;
+}

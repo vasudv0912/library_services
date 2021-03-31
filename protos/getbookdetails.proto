@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+import "protos/availablerequestmesg.proto";
+import "protos/availableresponsemesg.proto";
+import "protos/bookdetailsrequestmesg.proto";
+import "protos/bookdetailsresponsemesg.proto";
+import "protos/bookrecordrequestmesg.proto";
+import "protos/bookrecordresponsemesg.proto";
+
+service GetBookdetails {
+    rpc availableBooks (AvailableRequestMesg) returns (AvailableResponseMesg) {}
+    rpc bookDetails (BookDetailsRequestmesg) returns (BookDetailsResponseMesg) {}
+    rpc bookRecord (BookRecordRequestMesg) returns (BookRecordResponseMesg) {}
+}
+
